@@ -6,70 +6,103 @@ private:
 
 public:
 
-float x1, x2, y1, y2, steps, dx, dy, Pk;
+	int x1, x2, y1, y2, steps, dx, dy;
 
 
-void drawPixelSimp(float xa, float ya, float xb, float yb, Color color) {
+	void drawPixelDDA(int xa, int ya, int xb, int yb, Color color) { //ahora con tiempo podemos reducir el codigo un poco
 
-	dx = xb - xa;
+		dx = xb - xa;
 
-	dy = yb - ya;
+		dy = yb - ya;
 
-	if (abs(dx) >= abs(dy))
-	{
-		steps = dx;
+		steps = abs(dx) > abs(dy) ? abs(dx) : abs(dy);
 
-		float xinc = dx / steps;
-		float yinc = dy / steps;
+		float xinc = dx / (float)steps;
+		float yinc = dy / (float)steps;
 
-		for (int i = 0; i < steps; i++)
-		{
-			DrawPixel(xa, ya, color);
-			xa += xinc;
-			ya += yinc;
+		float x = xa;
+		float y = ya;
+
+		for (int i = 0; i <= steps; i++) {
+			DrawPixel(round(x), round(y), color);
+			x += xinc;
+			y += yinc;
 		}
-	}
-	else
-	{
-		steps = dy;
-
-		float xinc = dx / steps;
-		float yinc = dy / steps;
-
-		for (int i = 0; i < steps; i++)
-		{
-			DrawPixel(dx, dy, color);
-			dx += xinc;
-			dy += yinc;
-		}
-	}
 }
 
-void drawPixelBresenham(float xa, float ya, float xb, float yb, Color color)
-{
-	dx = xb - xa;
-	dy = yb - ya;
+	void drawPixelBresenham(int xa, int ya, int xb, int yb, Color color)
+	{
+		//casos especiales
+		if (xa == xb) {
+			// Línea vertical
+			int startY = ya < yb ? ya : yb;
+			int endY = ya > yb ? ya : yb;
+			for (int y = startY; y <= endY; y++) {
+				DrawPixel(xa, y, color);
+			}
+			return;
+		}
+		if (ya == yb) {
+			// Línea horizontal
+			int startX = xa < xb ? xa : xb;
+			int endX = xa > xb ? xa : xb;
+			for (int x = startX; x <= endX; x++) {
+				DrawPixel(x, ya, color);
+			}
+			return;
+		}
+
+		dx = fabs(xb - xa);
+		dy = fabs(yb - ya);
 	
-	float p1 = 2 * dy - dx;
-	float pk = p1;
+		int sx = (xa < xb) ? 1 : -1;
+		int sy = (ya < yb) ? 1 : -1;
+		int err = (dx > dy ? dx : -dy) / 2, e2;
 
-	while (xa <= xb) 
-	{
-		if (pk > 0) 
-		{
-			float pnext = pk + (2 * dy) - (2 * dx);
-			pk = pnext;
+		while (true) {
 			DrawPixel(xa, ya, color);
-			xa++;
-		}
-		else
-		{
-			float pnext = pk + (2 * dy);
-			pk = pnext;
-			DrawPixel(xa, ya, color);
-			xa++;
-			ya++;
+			if (xa == xb && ya == yb) break; // Cambie la condicion aqui por que no cerraba el circulo si la dejaba en el while
+			e2 = err;
+			if (e2 > -dx) {
+				err -= dy;
+				xa += sx;
+			}
+			if (e2 < dy) {
+				err += dx;
+				ya += sy;
+			}
 		}
 	}
-}
+
+	void drawCircleOutline(int xc, int yc, int radius, Color color) {
+		int angleStep = 10;
+		for (int angle = 0; angle < 180; angle += angleStep) {
+			float radStart = angle * (PI / 180.0f); 
+			float radEnd = (angle + 180) * (PI / 180.0f); 
+			// Puntos iniciales y finales de la línea
+			int xs = xc + radius * cosf(radStart);
+			int ys = yc + radius * sinf(radStart);
+			int xe = xc + radius * cosf(radEnd);
+			int ye = yc + radius * sinf(radEnd);
+			drawPixelBresenham(xs, ys, xe, ye, color);
+		}
+	}
+
+	void drawCircleShape(int xc, int yc, int radius, Color color) {
+		int angleStep = 10; 
+		for (int angle = 0; angle < 360; angle += angleStep) {
+		
+			float radStart = angle * (PI / 180.0f); 
+			int xs = xc + radius * cosf(radStart);
+			int ys = yc + radius * sinf(radStart);
+
+			// Punto final en la circunferencia (siguiente punto a lo largo del círculo)
+			float radEnd = (angle + angleStep) * (PI / 180.0f); 
+			int xe = xc + radius * cosf(radEnd);
+			int ye = yc + radius * sinf(radEnd);
+
+			// Dibujar línea entre los puntos
+			drawPixelBresenham(xs, ys, xe, ye, color);
+		}
+	}
 };

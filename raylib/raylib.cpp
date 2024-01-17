@@ -26,9 +26,17 @@ int main()
 
         
 
-        //linea.drawPixelSimp(linea.x1, linea.y1, linea.x2, linea.y2, RED);
+        //linea.drawPixelDDA(linea.x1, linea.y1, linea.x2, linea.y2, RED);
 
-        linea.drawPixelBresenham(1, 1, 80, 50, RED);
+        //linea.drawPixelBresenham(400, 300, 80, 50, RED);
+
+        linea.drawCircleOutline(200, 200, 50, RED);
+
+        linea.drawCircleShape(200, 200, 50, RED);
+
+        linea.drawCircleOutline(324, 324, 50, PINK);
+
+        linea.drawCircleShape(324, 324, 50, PINK);
         
         EndDrawing();
     }
