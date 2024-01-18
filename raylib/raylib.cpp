@@ -37,6 +37,20 @@ int main()
         linea.drawCircleOutline(324, 324, 50, PINK);
 
         linea.drawCircleShape(324, 324, 50, PINK);
+
+        linea.FillCircle(324, 324, 50, PINK);
+
+        linea.drawTriangle(100, 100, 200, 100, 150, 50, BLUE);
+
+        linea.FillTriangleMaxMin(100, 100, 200, 100, 150, 50, BLUE);
+
+        linea.drawTriangleBresenham(300, 200, 350, 200, 325, 150, GREEN);
+
+        linea.drawRect(450, 100, 550, 100, 550, 200, 450, 200, BLACK);
+
+        linea.FillSquareWithTriangles(450, 100, 550, 100, 550, 200, 450, 200, BLACK);
+        
+        linea.drawRect(30, 200, 130, 200, 130, 300, 30, 300, DARKPURPLE);
         
         EndDrawing();
     }
